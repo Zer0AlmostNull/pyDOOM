@@ -8,6 +8,7 @@ from settings import *
 from map import Map
 from player import Player
 from raycasting import RayCasting
+from object_renderer import ObjectRenderer
 
 class Game:
     def __init__(self) -> None:
@@ -23,9 +24,12 @@ class Game:
     def new_game(self):
         self.map = Map(self)
         self.player = Player(self)
+        self.object_renderer = ObjectRenderer(self)
         self.raycasting = RayCasting(self)
     
     def update(self):
+        self.raycasting.update()
+
         # update the screen
         pg.display.flip()
     
@@ -35,9 +39,6 @@ class Game:
         # update player
         self.player.update()
 
-        # 
-        
-
         # debug set fps as title of screen
         pg.display.set_caption(f'{self.clock.get_fps():.1f}')
 
@@ -46,11 +47,11 @@ class Game:
         self.screen.fill((0,0,0))
 
         # draw minimap *debug
-        self.map.draw_minimap()
-        self.raycasting.update()
+        #self.map.draw_minimap()
+        #self.raycasting.update()
 
         # draw debug player on minimap
-        self.player.draw_minimap()
+        #self.player.draw_minimap()
     
     def check_events(self):
         # event pull

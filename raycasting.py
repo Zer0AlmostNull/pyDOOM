@@ -5,11 +5,18 @@ from settings import *
 class RayCasting:
     def __init__(self,game) -> None:
         self.game = game
+
+        self.ray_casting_result = []
+        self.object_to_render = []
+        self.textures = self.game.object_renderer.wall_textures
     
     def ray_cast(self):
         # get curr pos
         ox, oy = self.game.player.pos
         x_map, y_map = self.game.player.map_pos
+
+        #
+        texture_vert, texture_hor = 1, 1
 
         # get angle of first left ray
         ray_angle = self.game.player.angle - HALF_FOV + 0.0001 
@@ -55,14 +62,21 @@ class RayCasting:
             # depth
             depth = min(depth_vert, deph_hor)
             
-            pg.draw.line(self.game.screen,
-                        (255,0,0),
-                        (MINIMAP_TILE_SIZE*ox, MINIMAP_TILE_SIZE*oy),
-                        (MINIMAP_TILE_SIZE*(ox + depth*cos_a), MINIMAP_TILE_SIZE*(oy+depth*sin_a)),
-                        2
-                        )
+            # remove lens effect
+            depth *= math.cos(self.game.player.angle - ray_angle)
+
+            # projection height
+            proj_height = (SCREEN_DIST / (depth + 0.0001))
+
+            # make color depend on distance
+            color = [255/(1 + depth**5*0.00002)]*3
+
+            # draw part of a wall
+            pg.draw.rect(self.game.screen, color,
+                         (ray*PROJECTION_SCALE, WND_HEIGHT_HALF - proj_height//2, PROJECTION_SCALE, proj_height))
+
             
-            ray_angle +=DELTA_ANGLE
+            ray_angle += DELTA_ANGLE
         
     def update(self):
         self.ray_cast()
